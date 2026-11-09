@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "depuracao"
+version = "0.1.0"
+description = "Download e comparação dos Boletins de Urna de 2022 e 2026 do TSE"
+requires-python = ">=3.12"
+dependencies = ["duckdb>=1.3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

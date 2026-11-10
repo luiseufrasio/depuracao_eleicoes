@@ -45,12 +45,29 @@ A conferência bloqueia se faltar UF, se a contagem de um candidato diferir da t
 | Fase | Entrega | Estado |
 |---|---|---|
 | 1. Download dos CSVs e do cadastro | Downloader que retoma de onde parou, confere o SHA-512 oficial e registra cada arquivo em um manifesto | concluída |
-| 2. Base analítica | Parquet + DuckDB em esquema único. Só avança se os totais baterem com os resultados oficiais por UF | em andamento |
+| 2. Base analítica | Parquet + DuckDB em esquema único. Só avança se os totais baterem com os resultados oficiais por UF | concluída |
 | 3. Download e leitura dos brutos | Validação da leitura em AC, depois o restante, começando por 2022 | pendente |
 | 4. Correspondência 2022–2026 | Grau de comparabilidade por seção e escola, com o município como nível seguro. Comparação por turno, comparecimento, brancos e nulos, e candidatos agrupados em tabela versionada | pendente |
 | 5. Detectores de anomalia | Três níveis, descritos abaixo | pendente |
 | 6. Validação dos detectores | Fraude simulada para medir a detecção, eleições anteriores como controle, correção para múltiplos testes | pendente |
 | 7. Aplicação web | FastAPI + DuckDB e React com mapa. Navegação Brasil, UF, município, escola e seção, comparador, fila de anomalias e ficha com evidência e link para o arquivo oficial | pendente |
+
+### Resultado da Fase 2
+
+A base nacional cobre as 27 UFs e o exterior nos dois turnos dos dois anos. Nenhum voto de Presidente difere da totalização oficial, nem por zona nem por seção.
+
+| Eleição | Seções com voto para Presidente | Votos (com brancos e nulos) | Chaves divergentes por seção |
+|---|---|---|---|
+| 2022, 1º turno | 472.028 | 123.682.372 | 0 |
+| 2022, 2º turno | 472.028 | 124.252.796 | 0 |
+| 2026, 1º turno | 499.206 | 125.275.835 | 0 |
+| 2026, 2º turno | 499.205 | 128.236.074 | 0 |
+
+Casos que o relatório mostra e que têm explicação nos próprios dados:
+
+- Em 2026, no 1º turno, Leonardo Avalanche (número 28) tem 5.246 votos nas urnas e não aparece na totalização por zona, porque consta como renúncia no cadastro do TSE. É a única diferença entre os votos nominais por zona e a totalização.
+- Em 2026, no 2º turno, duas seções do exterior tiveram comparecimento zero e por isso não têm voto para Presidente: município 29564, seção 91, e município 30686, seção 443. A primeira só existe no arquivo do 2º turno.
+- Em 2022, o arquivo marca como anuladas 4 seções no 1º turno e 1 no 2º.
 
 ### Detectores (Fase 5)
 
@@ -68,6 +85,7 @@ A conferência bloqueia se faltar UF, se a contagem de um candidato diferir da t
 
 ## Limites
 
+- A conferência da Fase 2 compara arquivos publicados pelo próprio TSE. Ela mostra que a base reproduz a totalização oficial sem erro de conversão, mas não é evidência independente de que os votos estejam corretos.
 - Com cerca de 500 mil seções, um limiar de 1% marca uns 5 mil casos só por acaso.
 - Mudanças de voto entre eleições são esperadas. Comunidades indígenas ou rurais costumam votar de forma muito concentrada.
 - As checagens de integridade detectam adulteração depois que a urna gerou os arquivos. Se a própria urna gerasse BU e RDV falsos de forma coerente, elas não pegariam, e só a estatística daria algum indício.

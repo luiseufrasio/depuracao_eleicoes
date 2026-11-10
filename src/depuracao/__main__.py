@@ -4,7 +4,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from . import base, baixar, catalogo, conferir
+from . import base, baixar, catalogo, conferir, unanimes
 
 
 def cmd_baixar(args) -> int:
@@ -31,6 +31,10 @@ def cmd_conferir(args) -> int:
     return conferir.conferir(args.dados, completo=not args.parcial)
 
 
+def cmd_unanimes(args) -> int:
+    return unanimes.relatorio(args.dados, args.candidatos)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="depuracao")
     parser.add_argument("--dados", type=Path, default=Path("data"), help="pasta dos dados")
@@ -51,6 +55,10 @@ def main() -> int:
     p = sub.add_parser("conferir", help="reconcilia a base com os arquivos oficiais")
     p.add_argument("--parcial", action="store_true", help="não exige todas as UFs")
     p.set_defaults(func=cmd_conferir)
+
+    p = sub.add_parser("unanimes", help="compara entre 2022 e 2026 as seções com votos só para um candidato")
+    p.add_argument("--candidatos", type=int, nargs="+", default=[13, 22], help="números dos candidatos")
+    p.set_defaults(func=cmd_unanimes)
 
     args = parser.parse_args()
     return args.func(args)

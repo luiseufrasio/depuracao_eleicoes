@@ -35,6 +35,7 @@ python -m venv .venv
 .\.venv\Scripts\python -m depuracao baixar     # retoma de onde parou e pula o que já está íntegro
 .\.venv\Scripts\python -m depuracao base       # gera data/parquet e data/eleicoes.duckdb
 .\.venv\Scripts\python -m depuracao conferir   # reconcilia com a totalização oficial
+.\.venv\Scripts\python -m depuracao unanimes   # seções com votos só para um candidato (padrão: 13 e 22), em data/analises
 .\.venv\Scripts\python -m pytest
 ```
 
@@ -47,7 +48,7 @@ A conferência bloqueia se faltar UF, se a contagem de um candidato diferir da t
 | 1. Download dos CSVs e do cadastro | Downloader que retoma de onde parou, confere o SHA-512 oficial e registra cada arquivo em um manifesto | concluída |
 | 2. Base analítica | Parquet + DuckDB em esquema único. Só avança se os totais baterem com os resultados oficiais por UF | concluída |
 | 3. Download e leitura dos brutos | Validação da leitura em AC, depois o restante, começando por 2022 | pendente |
-| 4. Correspondência 2022–2026 | Grau de comparabilidade por seção e escola, com o município como nível seguro. Comparação por turno, comparecimento, brancos e nulos, e candidatos agrupados em tabela versionada | pendente |
+| 4. Correspondência 2022–2026 | Grau de comparabilidade por seção e escola, com o município como nível seguro. Comparação por turno, comparecimento, brancos e nulos, e candidatos agrupados em tabela versionada | em andamento |
 | 5. Detectores de anomalia | Três níveis, descritos abaixo | pendente |
 | 6. Validação dos detectores | Fraude simulada para medir a detecção, eleições anteriores como controle, correção para múltiplos testes | pendente |
 | 7. Aplicação web | FastAPI + DuckDB e React com mapa. Navegação Brasil, UF, município, escola e seção, comparador, fila de anomalias e ficha com evidência e link para o arquivo oficial | pendente |
@@ -68,6 +69,17 @@ Casos que o relatório mostra e que têm explicação nos próprios dados:
 - Em 2026, no 1º turno, Leonardo Avalanche (número 28) tem 5.246 votos nas urnas e não aparece na totalização por zona, porque consta como renúncia no cadastro do TSE. É a única diferença entre os votos nominais por zona e a totalização.
 - Em 2026, no 2º turno, duas seções do exterior tiveram comparecimento zero e por isso não têm voto para Presidente: município 29564, seção 91, e município 30686, seção 443. A primeira só existe no arquivo do 2º turno.
 - Em 2022, o arquivo marca como anuladas 4 seções no 1º turno e 1 no 2º.
+
+### Fase 4: seções com votos só para um candidato
+
+Critério estrito: todos os votos da seção, contando brancos e nulos, foram para o candidato. O comando `unanimes` também calcula o critério "entre nominais", que tolera brancos e nulos. Uma seção só é considerada comparável entre anos se a chave e o local forem os mesmos e o eleitorado variar até 15%.
+
+| Candidato 13, critério estrito | 2022 | 2026 | Nos dois anos | Nos dois e comparáveis |
+|---|---|---|---|---|
+| 1º turno | 19 | 17 | 0 | 0 |
+| 2º turno | 29 | 29 | 2 | 1 |
+
+Com o critério entre nominais, o 13 tem 61 e 38 seções no 1º turno, e 143 e 106 no 2º. O mesmo cálculo para o número 22, como controle, dá 1 e 0 no 1º turno e 2 e 1 no 2º pelo critério estrito. A lista por seção fica em `data/analises`, fora do Git, conforme a decisão de publicação abaixo. Unanimidade não é evidência de fraude: ela aparece em seções pequenas e em comunidades muito coesas, como aldeias indígenas, e ainda falta um modelo que diga quantos casos seriam esperados.
 
 ### Detectores (Fase 5)
 

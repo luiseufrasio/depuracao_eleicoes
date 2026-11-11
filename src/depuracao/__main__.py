@@ -4,7 +4,7 @@ import sys
 from collections import Counter
 from pathlib import Path
 
-from . import base, baixar, catalogo, conferir, unanimes
+from . import base, baixar, catalogo, conferir, relatorio, unanimes
 
 
 def cmd_baixar(args) -> int:
@@ -35,6 +35,12 @@ def cmd_unanimes(args) -> int:
     return unanimes.relatorio(args.dados, args.candidatos)
 
 
+def cmd_relatorio(args) -> int:
+    saida = relatorio.gerar(args.dados, args.candidato, args.ano, args.turno, args.criterio)
+    print(f"relatório em {saida}")
+    return 0
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(prog="depuracao")
     parser.add_argument("--dados", type=Path, default=Path("data"), help="pasta dos dados")
@@ -59,6 +65,13 @@ def main() -> int:
     p = sub.add_parser("unanimes", help="compara entre 2022 e 2026 as seções com votos só para um candidato")
     p.add_argument("--candidatos", type=int, nargs="+", default=[13, 22], help="números dos candidatos")
     p.set_defaults(func=cmd_unanimes)
+
+    p = sub.add_parser("relatorio", help="PDF das seções com votos só para um candidato, com histórico e vizinhas da escola")
+    p.add_argument("--candidato", type=int, default=13)
+    p.add_argument("--ano", type=int, default=2026, choices=list(catalogo.ANOS))
+    p.add_argument("--turno", type=int, default=2, choices=[1, 2])
+    p.add_argument("--criterio", default="todos_os_votos", choices=list(unanimes.CRITERIOS))
+    p.set_defaults(func=cmd_relatorio)
 
     args = parser.parse_args()
     return args.func(args)

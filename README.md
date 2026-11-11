@@ -31,11 +31,12 @@ Os dados não ficam no repositório. Em uma máquina nova, os comandos abaixo ba
 git clone https://github.com/luiseufrasio/depuracao_eleicoes.git
 cd depuracao_eleicoes
 python -m venv .venv
-.\.venv\Scripts\python -m pip install -e ".[dev]"
+.\.venv\Scripts\python -m pip install -e ".[dev,relatorio]"
 .\.venv\Scripts\python -m depuracao baixar     # retoma de onde parou e pula o que já está íntegro
 .\.venv\Scripts\python -m depuracao base       # gera data/parquet e data/eleicoes.duckdb
 .\.venv\Scripts\python -m depuracao conferir   # reconcilia com a totalização oficial
 .\.venv\Scripts\python -m depuracao unanimes   # seções com votos só para um candidato (padrão: 13 e 22), em data/analises
+.\.venv\Scripts\python -m depuracao relatorio  # PDF em data/analises (padrão: candidato 13, 2º turno de 2026); aceita --candidato --ano --turno --criterio
 .\.venv\Scripts\python -m pytest
 ```
 
@@ -80,6 +81,8 @@ Critério estrito: todos os votos da seção, contando brancos e nulos, foram pa
 | 2º turno | 29 | 29 | 2 | 1 |
 
 Com o critério entre nominais, o 13 tem 61 e 38 seções no 1º turno, e 143 e 106 no 2º. O mesmo cálculo para o número 22, como controle, dá 1 e 0 no 1º turno e 2 e 1 no 2º pelo critério estrito. A lista por seção fica em `data/analises`, fora do Git, conforme a decisão de publicação abaixo. Unanimidade não é evidência de fraude: ela aparece em seções pequenas e em comunidades muito coesas, como aldeias indígenas, e ainda falta um modelo que diga quantos casos seriam esperados.
+
+O comando `relatorio` gera um PDF com o mapa das seções marcadas, a lista com o que cada seção fez na eleição anterior, e as outras seções do mesmo local de votação com o percentual de cada uma. Ele ordena as seções pela vizinha mais discrepante. No 2º turno de 2026, das 29 seções 100% do 13, 25 são a única seção do seu local de votação, e nas 4 restantes todas as vizinhas ficaram acima de 97%. Em 13 casos a seção existia em 2022 com resultado entre 93% e 100%, 15 não existiam com aquele número em 2022, e 16 estão em locais cujo nome indica aldeia indígena, quilombo ou assentamento.
 
 ### Detectores (Fase 5)
 

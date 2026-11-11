@@ -32,6 +32,8 @@ Os pacotes brutos somam 388 GB compactados (168,5 GB em 2022 e 219,2 GB em 2026)
 - A conversão com todos os cargos foi interrompida pelo sistema por falta de memória em uma máquina de 32 GB, sem confirmação de qual processo consumiu a RAM. A base guarda só Presidente, e o DuckDB fica limitado a 12 GB. Mesmo assim, a conversão nacional foi interrompida outra vez como processo em segundo plano do Claude Code, que encerra esses processos quando a memória do sistema fica baixa. Em um terminal próprio ela terminou e a conferência nacional fechou sem divergências. Rode `python -m depuracao base` fora do Claude Code. Ela retoma do ponto em que parou, sem refazer o que já está pronto.
 - Uma conversão interrompida deixa uma pasta `tmp_*` na partição daquela UF, que a retomada não apaga. Ela só guarda o CSV extraído e pode ser removida quando nenhuma conversão estiver rodando.
 
+- Em `locais`, latitude e longitude `-1` significam ausência, e boa parte de 2022 vem assim. Use as coordenadas de 2026. A tabela de 2026 repete cada linha de seção, então agrupe antes de contar.
+- Relatórios em PDF usam `reportlab` e `matplotlib`, instalados com `pip install -e ".[dev,relatorio]"`. Não há `poppler` nesta máquina, então o PDF não pode ser renderizado para conferência visual; confira o texto com `pypdf` e as figuras gerando os PNGs.
 - O indício indígena, quilombola ou de assentamento em `unanimes.py` vem só do nome do local e deixa casos de fora, como escolas com nome de etnia ou de cacique. "Não identificado" não significa que a comunidade não seja uma delas.
 
 ## Regras de trabalho
